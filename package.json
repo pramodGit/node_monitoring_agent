@@ -1,0 +1,26 @@
+{
+  "name": "node_monitoring_agent",
+  "version": "1.0.0",
+  "description": "Node.js Monitoring Agent",
+  "type": "module",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "nodemon --exec tsx src/app.ts",
+    "start": "tsx src/app.ts",
+    "build": "tsc",
+    "start:prod": "node dist/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "systeminformation": "^5.31.7"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "nodemon": "^3.1.14",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}
