@@ -1,23 +1,31 @@
-import { registerAlerts } from "./alerts/alert.service.js";
+import { connectProducer } from "./kafka/producer.js";
 
+import { registerAlerts } from "./alerts/alert.service.js";
 import { registerMetricsListener } from "./listeners/metrics.listener.js";
 
 import { startCpuMonitor } from "./monitors/cpu.monitor.js";
 import { startMemoryMonitor } from "./monitors/memory.monitor.js";
 import { startDiskMonitor } from "./monitors/disk.monitor.js";
 import { startProcessMonitor } from "./monitors/process.monitor.js";
-
 import { startSystemMonitor } from "./monitors/system.monitor.js";
 
-registerAlerts();
-registerMetricsListener();
+const bootstrap = async () => {
+  await connectProducer();
 
-startCpuMonitor();
-startMemoryMonitor();
-startDiskMonitor();
-startProcessMonitor();
+  registerAlerts();
+  registerMetricsListener();
 
-startSystemMonitor();
+  startCpuMonitor();
+  startMemoryMonitor();
+  startDiskMonitor();
+  startProcessMonitor();
+
+  startSystemMonitor();
+
+  console.log("Monitoring Agent Started");
+};
+
+bootstrap().catch(console.error);
 
 process.on("SIGINT", () => {
   console.log("Monitoring Agent Stopped");
@@ -28,5 +36,3 @@ process.on("SIGTERM", () => {
   console.log("Monitoring Agent Stopped");
   process.exit(0);
 });
-
-console.log("Monitoring Agent Started");
