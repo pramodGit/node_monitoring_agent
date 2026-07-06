@@ -1,5 +1,7 @@
 import { connectProducer } from "./kafka/producer.js";
 
+import { registerKafkaBridge } from "./kafka/eventBridge.js";
+
 import { registerAlerts } from "./alerts/alert.service.js";
 import { registerMetricsListener } from "./listeners/metrics.listener.js";
 
@@ -11,6 +13,8 @@ import { startSystemMonitor } from "./monitors/system.monitor.js";
 
 const bootstrap = async () => {
   await connectProducer();
+
+  registerKafkaBridge();
 
   registerAlerts();
   registerMetricsListener();
