@@ -16,6 +16,10 @@ Future phases will integrate:
 - Telegram Notifications
 - AI-based anomaly detection
 
+##
+"My monitoring agent raises domain events through an internal event bus. A Kafka bridge subscribes to those events and publishes them to Kafka. Downstream microservices like Logger and Alert consume the events independently without the monitoring agent being aware of them."
+##
+
 ---
 
 ## Features
