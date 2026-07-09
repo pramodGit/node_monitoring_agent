@@ -1,4 +1,5 @@
 export const EVENTS = {
+  APP_EVENT: "domain.event",
   CPU_HIGH: "cpu.high",
   MEMORY_HIGH: "memory.high",
   DISK_HIGH: "disk.high",

@@ -1,6 +1,7 @@
 import si from "systeminformation";
 import { eventBus } from "../events/eventBus.js";
 import dotenv from "dotenv";
+import { EVENTS } from "../types/event.types.js";
 
 const processStatus = new Map<string, boolean>();
 dotenv.config();
@@ -25,7 +26,7 @@ export const startProcessMonitor = () => {
 
         // Down event (only once)
         if (previous !== false && !exists) {
-          eventBus.emit("process.down", {
+          eventBus.emit(EVENTS.APP_EVENT, {
             process: processName,
             timestamp: new Date().toISOString()
           });
@@ -33,7 +34,7 @@ export const startProcessMonitor = () => {
 
         // Recovery event
         if (previous === false && exists) {
-          eventBus.emit("process.up", {
+          eventBus.emit(EVENTS.APP_EVENT, {
             process: processName,
             timestamp: new Date().toISOString()
           });
