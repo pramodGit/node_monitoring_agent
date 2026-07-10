@@ -1,38 +1,66 @@
 # Node Monitoring Agent
 
-A lightweight event-driven server monitoring agent built with Node.js and TypeScript.
-
-## Overview
-
-The Monitoring Agent continuously monitors server resources and system processes, generating events that can be consumed by alerting, logging, analytics, or messaging systems.
-
-Current implementation uses Node.js EventEmitter as the internal event bus.
-
-Future phases will integrate:
-
-- Apache Kafka
-- MongoDB
-- React Dashboard
-- Telegram Notifications
-- AI-based anomaly detection
-
-##
-"My monitoring agent raises domain events through an internal event bus. A Kafka bridge subscribes to those events and publishes them to Kafka. Downstream microservices like Logger and Alert consume the events independently without the monitoring agent being aware of them."
-##
+A lightweight event-driven server monitoring agent built with **Node.js** and **TypeScript**.
 
 ---
 
-## Features
+# Overview
 
-### Resource Monitoring
+The Monitoring Agent continuously monitors server resources and critical processes, generating **Domain Events** that are published through an internal Event Bus.
+
+A Kafka Bridge subscribes to the internal Event Bus and publishes events to **Apache Kafka**. Downstream microservices (such as Logger and Alert services) consume these events independently, allowing the Monitoring Agent to remain completely decoupled from consumers.
+
+This architecture follows an **Event-Driven Microservices** design where producers and consumers evolve independently.
+
+---
+
+# Responsibilities
+
+The Monitoring Agent is responsible only for:
+
+- Collecting system metrics
+- Monitoring critical processes
+- Detecting threshold violations
+- Creating Domain Events
+- Publishing events to Kafka
+
+It is **not responsible** for logging, alerting, analytics, dashboards, or notifications. Those concerns are handled by independent downstream microservices.
+
+---
+
+# Architecture Highlights
+
+- Event-Driven Architecture
+- Domain Events
+- Internal Event Bus
+- Kafka Event Streaming
+- Producer / Consumer Architecture
+- Loose Coupling
+- Asynchronous Processing
+
+---
+
+# Future Enhancements
+
+- React Monitoring Dashboard
+- Telegram Notifications
+- Email Notifications
+- AI-based Anomaly Detection
+- Kubernetes Deployment
+
+---
+
+# Features
+
+## Resource Monitoring
 
 - CPU Usage Monitoring
 - Memory Usage Monitoring
 - Disk Usage Monitoring
 
-### Process Monitoring
+## Process Monitoring
 
-Monitor critical processes such as:
+Monitor critical services such as:
 
 - Node.js
 - MongoDB
@@ -44,9 +72,35 @@ Generate events when:
 - Process goes down
 - Process comes back online
 
-### Event-Driven Architecture
+---
 
-Uses a centralized Event Bus based on Node.js EventEmitter.
+## Event Flow
+
+```text
+CPU Monitor
+      │
+      ▼
+Create Domain Event
+      │
+      ▼
+Internal Event Bus
+      │
+      ▼
+Kafka Bridge
+      │
+      ▼
+Apache Kafka
+      │
+      ├──────────────┐
+      ▼              ▼
+Logger Service   Alert Service
+```
+
+---
+
+## Event-Driven Architecture
+
+The Monitoring Agent uses a centralized **Event Bus** built on Node.js **EventEmitter**.
 
 Supported events:
 
@@ -57,81 +111,73 @@ Supported events:
 - process.down
 - process.up
 
-### Alerting
+---
 
-Alert listeners can subscribe to events and perform actions such as:
+## Kafka Integration
 
-- Console logging
-- Email notifications
-- Telegram notifications
-- Kafka publishing
+- Apache Kafka Producer
+- Kafka Bridge
+- Domain Events
+- Asynchronous Event Publishing
+- Decoupled Microservices
 
 ---
 
-## Architecture
+# Architecture
 
 ```text
-┌─────────────────────────────┐
-│      Monitoring Agent       │
-└──────────────┬──────────────┘
-               │
-               ▼
-       ┌─────────────┐
-       │  Event Bus  │
-       └──────┬──────┘
-              │
-    ┌─────────┼─────────┐
-    ▼         ▼         ▼
-
- Alerts   Metrics     Future
- Service  Listener    Consumers
+                 ┌──────────────────────────┐
+                 │    Monitoring Agent      │
+                 └─────────────┬────────────┘
+                               │
+                               ▼
+                     Internal Event Bus
+                               │
+                               ▼
+                        Kafka Bridge
+                               │
+                               ▼
+                         Apache Kafka
+                               │
+               ┌───────────────┴───────────────┐
+               ▼                               ▼
+        Logger Service                  Alert Service
 ```
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```text
 src/
 │
-├── alerts/
-│   └── alert.service.ts
-│
+├── config/
 ├── events/
-│   └── eventBus.ts
-│
-├── listeners/
-│   └── metrics.listener.ts
-│
+├── kafka/
 ├── monitors/
-│   ├── cpu.monitor.ts
-│   ├── memory.monitor.ts
-│   ├── disk.monitor.ts
-│   ├── process.monitor.ts
-│   └── system.monitor.ts
-│
 ├── services/
-│   └── systemMetrics.service.ts
-│
+├── types/
+├── utils/
 └── app.ts
 ```
 
 ---
 
-## Technology Stack
+# Technology Stack
 
 - Node.js
 - TypeScript
 - EventEmitter
+- Apache Kafka
+- KafkaJS
 - systeminformation
-- tsx
-- nodemon
+- systemd
 
 ---
 
-## Installation
+# Installation
 
-Clone repository:
+Clone the repository:
 
 ```bash
 git clone <repository-url>
@@ -146,9 +192,11 @@ npm install
 
 ---
 
-## Running Locally
+# Running Locally
 
-Development mode:
+Ensure **Apache Kafka** is running before starting the Monitoring Agent.
+
+Development:
 
 ```bash
 npm run dev
@@ -163,7 +211,7 @@ npm start
 
 ---
 
-## Example Output
+# Example Output
 
 ```text
 Monitoring Agent Started
@@ -171,57 +219,97 @@ Monitoring Agent Started
 [Metrics] CPU=38.72% | MEM=74.28%
 
 🚨 PROCESS DOWN
+
 {
-  process: 'nginx',
-  timestamp: '2026-06-01T08:12:16.022Z'
+  process: "nginx",
+  timestamp: "2026-06-01T08:12:16.022Z"
 }
 ```
 
 ---
 
-## Graceful Shutdown
+# Graceful Shutdown
 
 The application handles:
 
 - SIGINT
 - SIGTERM
 
-for clean shutdown and future resource cleanup.
+to support graceful shutdown and future resource cleanup.
 
 ---
 
-## Roadmap
+# Design Principles
 
-### Phase 1 ✅
+- Event-Driven Architecture
+- Domain Events
+- Loose Coupling
+- Single Responsibility Principle (SRP)
+- Open/Closed Principle (OCP)
+- Asynchronous Messaging
+- Microservice-Friendly Design
 
-- Event Bus
+---
+
+# Roadmap
+
+## Phase 1 ✅ Monitoring Foundation
+
 - CPU Monitoring
 - Memory Monitoring
 - Disk Monitoring
 - Process Monitoring
-- Alert Service
-- Metrics Listener
+- Event Factory
+- Internal Event Bus
 
-### Phase 2 🚧
+---
 
-- Apache Kafka Integration
+## Phase 2 ✅ Event Streaming
+
 - Kafka Producer
-- Kafka Consumer
+- Kafka Bridge
+- Domain Events
+- Event Publishing
+- Loose Coupling
 
-### Phase 3
+---
 
-- MongoDB Storage
-- Historical Metrics
+## Phase 3 🚧 Event Processing
 
-### Phase 4
+- Logger Service
+- Alert Service
+- Event Persistence
+- Retry Mechanism
+- Dead Letter Queue (DLQ)
 
-- React Monitoring Dashboard
+---
 
-### Phase 5
+## Phase 4 🚧 Dashboard
 
-- Telegram Alerts
+- React Dashboard
+- Live Metrics
+- Historical Charts
+
+---
+
+## Phase 5 🚧 Notifications
+
+- Telegram Notifications
 - Email Notifications
+- Slack Integration
 
-### Phase 6
+---
+
+## Phase 6 🚧 AI
 
 - AI-based Anomaly Detection
+- Predictive Alerts
+
+---
+
+# Related Projects
+
+- **Node Monitoring Agent** (Producer)
+- **Logger Service** (Consumer)
+- **Alert Service** (Consumer)
+- **Monitoring Dashboard** *(Upcoming)*
